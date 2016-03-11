@@ -1,6 +1,5 @@
 SerialPort.listDevices;
 //HOOK UP POTS TO ARGS
-//Play with Petals
 (
 s.options.memSize = 81920;
 s.options.numAudioBusChannels = 200;
@@ -23,7 +22,7 @@ s.waitForBoot{
 			/*fsr0*/[100,900,0.0, 100.0]
 		];
 		//////Switch Headers
-		var sh = ["b0", "b1", "b2", "b3"];
+		var sh = ["b0", "b1", "b2", "b3", "b4", "b5", "b6", "b7"];
 		////////Switch Actions
 		var switchAction = [
 			//b0 = Amplify On/Off
@@ -36,18 +35,28 @@ s.waitForBoot{
 				1,{ s.sendMsg(\s_new, \icy, 4100, 0, 1002, \ibs, 120, \obs, 0, \buf, 99, \envbuf, 100, \winsz, 0.6, \overlaps, 27, \rand, 0.5,\rel, 0.7, \crv, -3, \rate, 0.02, \amp, 0.6); led.send(1,1) },
 				0,{ s.sendMsg(\n_set, 4100, \gate, 0); led.send(1,0) }
 			)},
-			//b2 = Petals On/Off
-			{ |vl| switch( vl,
-				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4200, 0, 1002, \ibs, 120); led.send(2,1) },
-				0,{ s.sendMsg(\n_set, 4200, \gate, 0); led.send(2,0) }
-			)},
-			/*b3*/{ |vl| switch( vl, 0,{}, 1,{} ) }
+			/*b2*/{ |vl| switch( vl, 0,{}, 1,{} ) },
+			/*b3*/{ |vl| switch( vl, 0,{}, 1,{} ) },
+			/*b4*/{ |vl| switch( vl, 0,{}, 1,{} ) },
+			/*b5*/{ |vl| switch( vl, 0,{}, 1,{} ) },
+			/*b6*/{ |vl| switch( vl, 0,{}, 1,{} ) },
+			/*b7*/{ |vl| switch( vl, 0,{}, 1,{} ) },
 		];
 		//////Toggle Headers
-		var sth = ["bt7", "bt6", "bt5", "bt4"];
+		var sth = ["bt0", "bt1", "bt2", "bt3", "bt4", "bt5", "bt6", "bt7"];
 		////////Toggle Actions
 		var toggleAction = [
-
+			/*b0*/{ |vl| switch( vl, 0,{}, 1,{} ) },
+			/*b1*/{ |vl| switch( vl, 0,{}, 1,{} ) },
+			/*b2*/{ |vl| switch( vl, 0,{}, 1,{} ) },
+			/*b3*/{ |vl| switch( vl, 0,{}, 1,{} ) },
+			/*b4*/{ |vl| switch( vl, 0,{}, 1,{} ) },
+			/*b5*/{ |vl| switch( vl, 0,{}, 1,{} ) },
+			//b6 = Freeze On/Off
+			{ |vl| switch( vl,
+				1,{ s.sendMsg(\s_new, \icy, 4100, 0, 1002, \ibs, 120, \obs, 0, \buf, 99, \envbuf, 100, \winsz, 0.6, \overlaps, 27, \rand, 0.5,\rel, 0.7, \crv, -3, \rate, 0.02, \amp, 0.6); led.send(1,1) },
+				0,{ s.sendMsg(\n_set, 4100, \gate, 0); led.send(1,0) }
+			)},
 			//bt7 = Amplify On/Off
 			{ |vl|
 				//Start Indexer and Sample Play once at beginning when bt7 is pressed
@@ -59,22 +68,9 @@ s.waitForBoot{
 					start = false;
 				});
 				switch( vl,
-				1,{ s.sendMsg(\s_new, \amplify, 4001, 0, 1002, \ibs, 120, \obs, 0); led.send(0,1) },
-				0,{ s.sendMsg(\n_set, 4001, \gate, 0); led.send(0,0) }
-			)},
-
-			//bt6 = Freeze On/Off
-			{ |vl| switch( vl,
-				1,{ s.sendMsg(\s_new, \icy, 4101, 0, 1002, \ibs, 120, \obs, 0, \buf, 99, \envbuf, 100, \winsz, 0.6, \overlaps, 27, \rand, 0.5,\rel, 0.7, \crv, -3, \rate, 0.02, \amp, 0.6); led.send(1,1) },
-				0,{ s.sendMsg(\n_set, 4101, \gate, 0); led.send(1,0) }
-			)},
-
-			//bt5 = Petals On/Off
-			{ |vl| switch( vl,
-				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4201, 0, 1002, \ibs, 120); led.send(2,1) },
-				0,{ s.sendMsg(\n_set, 4201, \gate, 0); led.send(2,0)}
+				1,{ s.sendMsg(\s_new, \amplify, 4000, 0, 1002, \ibs, 120, \obs, 0); led.send(0,1) },
+				0,{ s.sendMsg(\n_set, 4000, \gate, 0); led.send(0,0) }
 			)}
-
 		];
 		//////Arduino Action /////////////////////
 		ino.action = {
@@ -275,7 +271,8 @@ s.waitForBoot{
 	}//end fork
 }//end s.waitForBoot
 )
-
+s.sendMsg(\c_get, 101);
+OSCdef(\ff, {|msg| msg.postln}, "/c_set");
 /*
 LEGEND //////////////////
 NODES
@@ -287,7 +284,6 @@ NODES
 3000 = Samp Play Synth
 4000s = Amplify Synths
 4100s = Icy Synths
-4200s = Petals Synths
 
 BUSSES
 Audio Busses - 100-199
