@@ -1,19 +1,5 @@
 SerialPort.listDevices;
-//GRANULAR
-////SEND EACH EFFECT OUT TO STEREO BUS
-////PICK UP AND GRANULATE
-////LMG - SAMPLE TRILL
-////Greyhole
-//HOOK UP POTS TO ARGS - ONEKNOB WORK OUT SETTINGS FOR ALL 4 EFFECTS
-////AMPLIFY, STEREOIFY AND CONTROL DELAY
-//STEREOIFY OTHER EFFECTS
-////ONE SLIDER IS MASTER VOLUME; SETS AN ARRAY WHICH IS REFERED TO WHEN SWITCHING EFFECTS
-////FIND KNOBS AT SARC FOR THE SPIN POTS
-//ADD ONE BUTTON (AND ONE FSR?) TO SWITCH GRANULAR STATES; WAY TO HAVE TWO VOICES ASSIGNED TO 2 FSRS
-//GRANULAR MODE PRUSUMES ALL 4 EFFECTS ON AND THE BUTTON SWITCHES BETWEEN PAIRS OF EFFECTS - defaultMode, (1,2), (3,4), (1,4), (2,3), (2,4), (1,3)
-//EXTRA LEDS SO 1 COLOR PER EFFECT IN DEFAULT MODE
-//MAKE SEPARATE FSR BOARD ON SEPARATE ARDUINO?
-//KEEP MOVING FORWARD WITH PIECE/PERFORMANCE, LEAVE TIME TO PLAY AND PRACTICE
+//HOOK UP POTS TO ARGS
 //Play with Petals
 (
 s.options.memSize = 81920;
@@ -42,17 +28,17 @@ s.waitForBoot{
 		var switchAction = [
 			//b0 = Amplify On/Off
 			{ |vl| switch( vl,
-				1,{ s.sendMsg(\s_new, \amplify, 4000, 0, 1002, \ibs, 120, \obs, 0, \pobs, 150); led.send(0,1) },
+				1,{ s.sendMsg(\s_new, \amplify, 4000, 0, 1002, \ibs, 120, \obs, 0); led.send(0,1) },
 				0,{ s.sendMsg(\n_set, 4000, \gate, 0); led.send(0,0) }
 			)},
 			//b1 = Freeze On/Off
 			{ |vl| switch( vl,
-				1,{ s.sendMsg(\s_new, \icy, 4100, 0, 1002, \ibs, 120, \obs, 0, \pobs, 152, \buf, 99, \envbuf, 100, \winsz, 0.6, \overlaps, 27, \rand, 0.5,\rel, 0.7, \crv, -3, \rate, 0.02); led.send(1,1) },
+				1,{ s.sendMsg(\s_new, \icy, 4100, 0, 1002, \ibs, 120, \obs, 0, \buf, 99, \envbuf, 100, \winsz, 0.6, \overlaps, 27, \rand, 0.5,\rel, 0.7, \crv, -3, \rate, 0.02, \amp, 0.6); led.send(1,1) },
 				0,{ s.sendMsg(\n_set, 4100, \gate, 0); led.send(1,0) }
 			)},
 			//b2 = Petals On/Off
 			{ |vl| switch( vl,
-				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4200, 0, 1002, \ibs, 120, \obs, 0 \pobs, 154); led.send(2,1) },
+				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4200, 0, 1002, \ibs, 120); led.send(2,1) },
 				0,{ s.sendMsg(\n_set, 4200, \gate, 0); led.send(2,0) }
 			)},
 			/*b3*/{ |vl| switch( vl, 0,{}, 1,{} ) }
@@ -73,19 +59,19 @@ s.waitForBoot{
 					start = false;
 				});
 				switch( vl,
-					1,{ s.sendMsg(\s_new, \amplify, 4001, 0, 1002, \ibs, 120, \obs, 0, \pobs, 1); led.send(0,1) },
-					0,{ s.sendMsg(\n_set, 4001, \gate, 0); led.send(0,0) }
+				1,{ s.sendMsg(\s_new, \amplify, 4001, 0, 1002, \ibs, 120, \obs, 0); led.send(0,1) },
+				0,{ s.sendMsg(\n_set, 4001, \gate, 0); led.send(0,0) }
 			)},
 
 			//bt6 = Freeze On/Off
 			{ |vl| switch( vl,
-				1,{ s.sendMsg(\s_new, \icy, 4101, 0, 1002, \ibs, 120, \obs, 0, \pobs, 152, \buf, 99, \envbuf, 100, \winsz, 0.6, \overlaps, 27, \rand, 0.5,\rel, 0.7, \crv, -3, \rate, 0.02); led.send(1,1) },
+				1,{ s.sendMsg(\s_new, \icy, 4101, 0, 1002, \ibs, 120, \obs, 0, \buf, 99, \envbuf, 100, \winsz, 0.6, \overlaps, 27, \rand, 0.5,\rel, 0.7, \crv, -3, \rate, 0.02, \amp, 0.6); led.send(1,1) },
 				0,{ s.sendMsg(\n_set, 4101, \gate, 0); led.send(1,0) }
 			)},
 
 			//bt5 = Petals On/Off
 			{ |vl| switch( vl,
-				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4201, 0, 1002, \ibs, 120, \obs, 0, \pobs, 154); led.send(2,1) },
+				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4201, 0, 1002, \ibs, 120); led.send(2,1) },
 				0,{ s.sendMsg(\n_set, 4201, \gate, 0); led.send(2,0)}
 			)}
 
@@ -155,22 +141,21 @@ s.waitForBoot{
 			Out.ar(obs, samp*env);
 		}).add;
 		SynthDef(\amplify, {
-			arg ibs, obs=0, pobs, gate=1;
+			arg ibs, obs=0, gate=1;
 			var src, sig, env, amp, sig2;
 			amp = \amp.kr(0.85, 0.03);
 			env = EnvGen.ar(Env.asr(releaseTime:0.01),gate,doneAction:2);
 			src = In.ar(ibs);
 			sig = src;
 			sig2 = DelayC.ar(sig, 0.2, 0.05);
-			Out.ar(pobs, [sig, sig2]*env*amp); //out to private (stereo) bus
 			Out.ar(obs, [sig, sig2]*env*amp);
 		}).add;
 		SynthDef(\icy, {
-			arg ibs, obs=0, pobs, buf=0, envbuf = -1, pitchshift=1, winsz=0.8, overlaps=40,
+			arg ibs, obs=0,buf=0, envbuf = -1, pitchshift=1, winsz=0.8, overlaps=40,
 			resettrig=0, startpos=0.0, endpos=1.0, rand=0.1, ratemin=0.4, ratemax=0.000001,
 			indur=2, t_tr=1, rel=0.3, crv = -6, gate=1;
 			var sig, ix, krate, in, writehead, whenv, durenv, sig2, amp;
-			amp = \amp.kr(0.33, 0.03);
+			amp = \amp.kr(0.5, 0.03);
 			durenv = EnvGen.ar(Env.asr(0.01, 1, rel, curve: crv),gate,doneAction:2);
 			writehead = Phasor.ar(0, BufRateScale.kr(buf), 0, BufFrames.kr(buf));
 			whenv = EnvGen.ar(Env.linen(0.0, indur, 0.0), t_tr);
@@ -179,19 +164,18 @@ s.waitForBoot{
 			ix = Phasor.kr(resettrig, ((1.0/ControlRate.ir)/(BufFrames.kr(buf)/SampleRate.ir))*krate, startpos, endpos);
 			sig = Warp1.ar(1, buf, ix, pitchshift, winsz, envbuf, overlaps,rand);
 			sig2 = DelayC.ar(sig, 0.2, 0.05);
-			Out.ar(pobs, [sig, sig2]*durenv*amp); //out to private (stereo) bus
 			Out.ar(obs, [sig, sig2]*durenv*amp);
 		}).add;
 		//// Petals Of Resonance
 		SynthDef("petalsOfResonance", {
-			arg masteramp=0.5, inamp=1.0, ibs=0, obs=0, pobs, fund=80, firstPartial=1, bank2MidiOffset=0.37, spread=1.33, ringL1=7.75, ringL2=15.5, inputLen=1, trig=1, gate=1;
-			var	pAmp, partialTunedA, partialTunedB, input, output, outArrayA, outArrayA1, outArrayA2, outArray, inenv, ltdOutput, ltdOutput1, ltdOutput2, masterEnv, finalOut,
+			arg masteramp=0.5, inamp=1.0, ibs=0, obs=0, fund=80, firstPartial=2, bank2MidiOffset=3.25, spread=1.33, ringL1=7.75, ringL2=15.5, inputLen=1, trig=1, gate=1;
+			var	pAmp, partialTunedA, partialTunedB, input, output, outArrayA, outArrayA1, outArrayA2, outArray, inenv, ltdOutput, masterEnv, finalOut,
 			p1a, p2a, p3a, p4a, p5a, p6a, p7a, p8a, p9a, p10a, p11a, p12a, p13a,
 			p1b, p2b, p3b, p4b, p5b, p6b, p7b, p8b, p9b, p10b, p11b, p12b, p13b,
 			resA1, resA2, resA3, resA4, resA5, resA6, resA7, resA8, resA9, resA10, resA11, resA12, resA13,
 			resB1, resB2, resB3, resB4, resB5, resB6, resB7, resB8, resB9, resB10, resB11, resB12, resB13;
 			var outenv, sig2;
-			pAmp = -20.dbamp;
+			pAmp = -40.dbamp;
 			//Two functions to create two sets of partials
 			partialTunedA = 	{
 				arg partialNum;
@@ -274,29 +258,20 @@ s.waitForBoot{
 			resB12 = DynKlank.ar(`[[p12b], nil, [rrand(ringL1, ringL2)]], input);
 			resB13 = DynKlank.ar(`[[p13b], nil, [rrand(ringL1, ringL2)]], input);
 			//Make an array of resonators and scramble them up
-			outArrayA = [ resA1*pAmp, resA2*pAmp, resA3*pAmp, resA4*pAmp, resA5*pAmp, resA6*pAmp, resA7*pAmp, resA8*pAmp, resA9*pAmp, resA10*pAmp,resA11*pAmp, resA12*pAmp, resA13*pAmp, resB1*pAmp, resB2*pAmp, resB3*pAmp, resB4*pAmp, resB5*pAmp, resB6*pAmp, resB7*pAmp, resB8*pAmp, resB9*pAmp, resB10*pAmp, resB11*pAmp, resB12*pAmp, resB13*pAmp ].scramble;
-
+			outArrayA = [ resA1*pAmp, resA2*pAmp, resA3*pAmp, resA4*pAmp, resA5*pAmp, resA6*pAmp, resA7*pAmp, resA8*pAmp, resA9*pAmp, resA10*pAmp,
+				resA11*pAmp, resA12*pAmp, resA13*pAmp, resB1*pAmp, resB2*pAmp, resB3*pAmp, resB4*pAmp, resB5*pAmp, resB6*pAmp, resB7*pAmp,
+				resB8*pAmp, resB9*pAmp, resB10*pAmp, resB11*pAmp, resB12*pAmp, resB13*pAmp ].scramble;
 			//For Stereo or Multichannel
-			outArrayA1 = Array.newFrom(outArrayA);
-			outArrayA1 = outArrayA1.copyRange(0, (outArrayA1.size/2).asInteger);
-			outArrayA2 = Array.newFrom(outArrayA);
-			outArrayA2 = outArrayA2.copyRange( (outArrayA2.size/2).asInteger, outArrayA2.size );
-			outArrayA1 = Mix.ar(outArrayA1);
-			outArrayA2 = Mix.ar(outArrayA2);
-			//STEREO
-			ltdOutput1 = Limiter.ar( outArrayA1, 0.98, 0.01 );
-			ltdOutput2 = Limiter.ar( outArrayA2, 0.98, 0.01 );
-			outenv = EnvGen.ar(Env.asr(0.01, 1, 2), gate, doneAction:2);
-			Out.ar(pobs, [ltdOutput1,ltdOutput2]*masteramp*outenv); //out to private (stereo)bus
-			Out.ar(obs, [ltdOutput1,ltdOutput2]*masteramp*outenv);
-			/*
-			//MONO
+			//outArrayA1 = outArrayA.copyRange(0, (outArrayA.size/2).asInteger);
+			//outArrayA2 = outArrayA.copyRange((outArrayA.size/2).asInteger, outArray.size);
+			//outArrayA1 = Mix.ar(outArrayA1);
+			//outArrayA2 = Mix.ar(outArrayA2);
 			//Mixes resonators to a mono channel
 			outArrayA = Mix.ar(outArrayA);
 			ltdOutput = Limiter.ar(outArrayA, 0.98, 0.01);
 			outenv = EnvGen.ar(Env.asr(0.01, 1, 2), gate, doneAction:2);
-			Out.ar(obs, ltdOutput*masteramp*outenv);
-			*/
+			sig2 = DelayC.ar(ltdOutput, 0.2, 0.05);
+			Out.ar(obs, [ltdOutput, sig2]*masteramp*outenv);
 			}, [0.069]
 		).add;
 	}//end fork
@@ -320,11 +295,6 @@ BUSSES
 Audio Busses - 100-199
 100 = Main Index Audio Bus
 120 = Samp Play Bus
-150 = Stereo Busses (pairs) for grainulation
-//150,151 = Amplify
-//152,153 = Freeze
-//154,155 = Petals
-//156, 157 = Greyhole
 
 Control Busses 0-4095
 0 = Main Index Control Bus

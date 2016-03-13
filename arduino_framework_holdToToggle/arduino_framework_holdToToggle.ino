@@ -5,21 +5,21 @@ int pv[5];//pot value
 int ppv[] = {0, 0,0,0,0}; //previous pot value
 
 //buttons
-int nb = 9;
-int b[] = { 2, 3,4,5,6,7,8,9,10 }; //digital input pins
-boolean bg[] = {true, true, true, true, true, true, true, true,true};//momentary button gates
+int nb = 8;
+int b[] = { 2, 3,4,5,6,7,8,9 }; //digital input pins
+boolean bg[] = {true, true, true, true, true, true, true, true};//momentary button gates
 ////button toggle
-int btv[] = { 0, 0,0,0,0,0,0,0,0 }; //toggle button current value
-int btamt[] = { 10,2,2,2,2,2,2,2,2 }; //number of toggles
-boolean btg[] = {true, true, true, true, true, true, true, true,true};//toggle button gates
+int btv[] = { 0, 0,0,0,0,0,0,0 }; //toggle button current value
+int btamt[] = { 10,2,2,2,2,2,2,2 }; //number of toggles
+boolean btg[] = {true, true, true, true, true, true, true, true};//toggle button gates
 
 //fsrs
-int numsens = 2;
-int fsr[] = {A5,A6};
-int val[2];
-int thresh[] = {100,230};
-boolean peakgate[] = {true,true};
-int pval[] = {0,0};
+int numsens = 1;
+int fsr[] = {A5};
+int val[1];
+int thresh[] = {100};
+boolean peakgate[] = {true};
+int pval[] = {0};
 
 void setup() {
   Serial.begin(9600);
