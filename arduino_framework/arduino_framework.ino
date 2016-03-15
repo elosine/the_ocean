@@ -1,25 +1,26 @@
 //pot
 int np = 5; //number of pots
-int p[] = { A0, A1,A2,A3,A4 }; //analog input pins
+int p[] = { A0, A1, A2, A3, A7 }; //analog input pins
 int pv[5];//pot value
-int ppv[] = {0, 0,0,0,0}; //previous pot value
+int ppv[] = {0, 0, 0, 0, 0}; //previous pot value
 
 //buttons
-int nb = 9;
-int b[] = { 2, 3,4,5,6,7,8,9,10 }; //digital input pins
-boolean bg[] = {true, true, true, true, true, true, true, true,true};//momentary button gates
+#define nb 11
+//int nb = 12;
+int b[] = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 }; //digital input pins
+boolean bg[] = {true, true, true, true, true, true, true, true, true, true, true, true}; //momentary button gates
 ////button toggle
-int btv[] = { 0, 0,0,0,0,0,0,0,0 }; //toggle button current value
-int btamt[] = { 10,2,2,2,2,2,2,2,2 }; //number of toggles
-boolean btg[] = {true, true, true, true, true, true, true, true,true};//toggle button gates
+int btv[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //toggle button current value
+int btamt[] = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }; //number of toggles
+boolean btg[] = {true, true, true, true, true, true, true, true, true, true, true}; //toggle button gates
 
 //fsrs
 int numsens = 2;
-int fsr[] = {A5,A6};
+int fsr[] = {A5, A6};
 int val[2];
-int thresh[] = {100,230};
-boolean peakgate[] = {true,true};
-int pval[] = {0,0};
+int thresh[] = {100, 230};
+boolean peakgate[] = {true, true};
+int pval[] = {0, 0};
 
 void setup() {
   Serial.begin(9600);
@@ -54,8 +55,14 @@ void loop() {
       }
     }
     else { //is below thresh
-      peakgate[i] = true;
-      pval[i] = 0;
+      if (!peakgate[i]) {
+        peakgate[i] = true;
+        pval[i] = 0;
+        Serial.print("fsr");
+        Serial.print(i);
+        Serial.print(":");
+        Serial.print(0);
+      }
     }
   }
 

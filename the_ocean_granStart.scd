@@ -520,25 +520,6 @@ s.sendMsg(\n_set, 5000, \minrateL, 2, \minrateH, 9,  \maxrateL, 13, \maxrateH, 1
 
 s.sendMsg( \s_new, \greyhole, 4300+ghct, 0, 302, \ibs, 120, \obs, 0, \pobs, 150, \del, 0.3)
 s.queryAllNodes
-//Use this to make a randomized long short, short...
-//Bursts of interesting patterns, bebop type phrasing
-(//AND is multiplication OR is addition
-{//swing
-	var master, t0, e0, s0, t1, e1, s1, i1, ie1;
-	master = Phasor.ar(0, (1.0/(44100.0*1.0)) );
-	t0 = master>0.01;
-
-	e0=EnvGen.ar(Env.perc(0.01, 0.2, 1,0),t0);
-	s0=SinOsc.ar(660);
-	t1 = (master>0.25)*(master<0.63);
-	ie1=EnvGen.ar(Env.asr(0.01, 1, 0.01, 0),t1);
-	i1 = Impulse.ar(6)*ie1;
-	e1=EnvGen.ar(Env.perc(0.01, 0.2, 1,0),i1);
-	s1=SinOsc.ar(440);
-	Out.ar(0, [s1*e1, s0*e0])
-
-}.play
-)
 
 
 

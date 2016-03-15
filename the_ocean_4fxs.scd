@@ -1,10 +1,5 @@
 SerialPort.listDevices;
-//FIX POT
-//LOOK AT SHORT ATTACKS AND MAKE BETTER
-//IMPLEMENT TRILL
-
-
-//HOT GLUE Pots
+//Add Pots
 //LONGER RELEASE AND MULTIPLE SYNTHS FOR FREEZE also make attack more percussive
 //GRANULAR
 ////SEND EACH EFFECT OUT TO STEREO BUS
@@ -31,10 +26,6 @@ s.waitForBoot{
 		var petct = 0;
 		var icect = 0;
 		var ghct = 0;
-		var ampon=false;
-		var iceon=false;
-		var peton=false;
-		var ghon=false;
 		//LEDs
 		var led = ArduinoSMS("/dev/tty.wchusbserial1a120", 9600);
 		////Arduino Controlers
@@ -43,7 +34,7 @@ s.waitForBoot{
 		var hh = ["p0", "p1", "p2", "p3", "p4", "fsr0"];
 		////////Mappings
 		var ma = [
-			/*p0*/[ [0,1023,0.0,1.5],[0,1023,0.0,1.0],[0,1023,0.0,1.0] ],
+			/*p0*/[ [0,1023,0.0,1.0],[0,1023,0.0,1.0],[0,1023,0.0,1.0] ],
 			/*p1*/[ [0,1023,0.0,1.0],[0,1023,0.0,1.0],[0,1023,0.0,1.0] ],
 			/*p2*/[ [0,1023,0.0,1.0],[0,1023,0.0,1.0],[0,1023,0.0,1.0] ],
 			/*p3*/[ [0,1023,0.01,13.1],[0,1023,0.0,1.0],[0,1023,0.0,1.0] ],
@@ -56,27 +47,27 @@ s.waitForBoot{
 		var switchAction = [
 			//b0 = Amplify On/Off
 			{ |vl| switch( vl,
-				1,{ s.sendMsg(\s_new, \amplify, 4000, 0, 302, \ibs, 120, \obs, 0, \pobs, 150); led.send(0,1); s.sendMsg(\n_map, 4000, \amp, 100); },
-				0,{ s.sendMsg(\n_set, 4000, \gate, 0); if(ampon==false,{ led.send(0,0) }) }
+				1,{ s.sendMsg(\s_new, \amplify, 4000, 0, 1002, \ibs, 120, \obs, 0, \pobs, 150); led.send(0,1) },
+				0,{ s.sendMsg(\n_set, 4000, \gate, 0); led.send(0,0) }
 			)},
 			//b1 = Freeze On/Off
 			{ |vl| switch( vl,
-				1,{ s.sendMsg(\s_new, \icy, 4100+icect, 0, 302, \ibs, 120, \obs, 0, \pobs, 150, \buf, 99, \envbuf, 100, \winsz, 0.6, \overlaps, 27, \rand, 0.5,\rel, 1.3, \crv, -3, \rate, 0.02, \ratemin, 4.0, \indur, 15); led.send(1,1); s.sendMsg(\n_map, 4100+icect, \amp, 100); },
-				0,{ s.sendMsg(\n_set, 4100+icect, \gate, 0); if(iceon==false,{led.send(1,0)}); icect=(icect+1)%5}
+				1,{ s.sendMsg(\s_new, \icy, 4100+icect, 0, 1002, \ibs, 120, \obs, 0, \pobs, 152, \buf, 99, \envbuf, 100, \winsz, 0.6, \overlaps, 27, \rand, 0.5,\rel, 1.3, \crv, -3, \rate, 0.02); led.send(1,1) },
+				0,{ s.sendMsg(\n_set, 4100+icect, \gate, 0); led.send(1,0); icect=(icect+1)%5}
 			)},
 			//b2 = Petals On/Off
 			{ |vl| switch( vl,
-				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4200+petct, 0, 302, \ibs, 120, \obs, 0, \pobs, 150); led.send(2,1); s.sendMsg(\n_map, 4200+petct, \amp, 100); },
-				0,{ s.sendMsg(\n_set, 4200+petct, \gate, 0); if(peton==false,{led.send(2,0)}); petct=(petct+1)%5 }
+				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4200+petct, 0, 1002, \ibs, 120, \obs, 0, \pobs, 154); led.send(2,1) },
+				0,{ s.sendMsg(\n_set, 4200+petct, \gate, 0); led.send(2,0); petct=(petct+1)%5 }
 			)},
 			//b3 = Greyhole
 			{ |vl| switch( vl,
-				1,{s.sendMsg( \s_new, \greyhole, 4300+ghct, 0, 302, \ibs, 120, \obs, 0, \pobs, 150, \del, 0.3); led.send(3,1); s.sendMsg(\n_map, 4300+ghct, \amp, 100); },
-				0,{s.sendMsg(\n_set, 4300+ghct, \gate, 0); if(ghon==false,{led.send(3,0)}); ghct=(ghct+1)%5}
+				1,{s.sendMsg( \s_new, \greyhole, 4300+ghct, 0, 1002, \ibs, 120, \obs, 0, \pobs, 156); led.send(3,1)},
+				0,{s.sendMsg(\n_set, 4300+ghct, \gate, 0); led.send(3,0); ghct=(ghct+1)%5}
 			)}
 		];
 		//////Toggle Headers
-		var sth = ["bt7", "bt6", "bt5", "bt4", "bt8"];
+		var sth = ["bt7", "bt6", "bt5", "bt4"];
 		////////Toggle Actions
 		var toggleAction = [
 
@@ -85,70 +76,39 @@ s.waitForBoot{
 				//Start Indexer and Sample Play once at beginning when bt7 is pressed
 				if(start,{
 					//Start Indexer
-					s.sendMsg(\s_new, \indexer, 2000, 0, 300, \buf, 0, \abus, 100, \kbus, 0);
+					s.sendMsg(\s_new, \indexer, 2000, 0, 1000, \buf, 0, \abus, 100, \kbus, 0);
 					//Play Sample
-					s.sendMsg(\s_new, \sampplay, 3000, 0, 301, \idxbus, 100, \buf, 0, \obs, 120);
+					s.sendMsg(\s_new, \sampplay, 3000, 0, 1001, \idxbus, 100, \buf, 0, \obs, 120);
 					start = false;
 				});
 				switch( vl,
-					1,{ s.sendMsg(\s_new, \amplify, 4001, 0, 302, \ibs, 120, \obs, 0, \pobs, 150); led.send(0,1); ampon=true; s.sendMsg(\n_map, 4001, \amp, 100); },
-					0,{ s.sendMsg(\n_set, 4001, \gate, 0); led.send(0,0); ampon=false }
+					1,{ s.sendMsg(\s_new, \amplify, 4001, 0, 1002, \ibs, 120, \obs, 0, \pobs, 1); led.send(0,1) },
+					0,{ s.sendMsg(\n_set, 4001, \gate, 0); led.send(0,0) }
 			)},
 
 			//bt6 = Freeze On/Off
 			{ |vl| switch( vl,
-				1,{ s.sendMsg(\s_new, \icy, 4199, 0, 302, \ibs, 120, \obs, 0, \pobs, 150, \buf, 99, \envbuf, 100, \winsz, 0.6, \overlaps, 27, \rand, 0.5,\rel, 1.3, \crv, -3, \rate, 0.02, \ratemin, 4.0, \indur, 15);
-					led.send(1,1);
-					iceon=true;
-					s.sendMsg(\n_map, 4199, \amp, 100);
-					s.sendMsg(\n_map, 4199, \rate, 120);
-				},
-				0,{ s.sendMsg(\n_set, 4199, \gate, 0); led.send(1,0);iceon=false }
+				1,{ s.sendMsg(\s_new, \icy, 4199, 0, 1002, \ibs, 120, \obs, 0, \pobs, 152, \buf, 99, \envbuf, 100, \winsz, 0.6, \overlaps, 27, \rand, 0.5,\rel, 1.3, \crv, -3, \rate, 0.02); led.send(1,1) },
+				0,{ s.sendMsg(\n_set, 4199, \gate, 0); led.send(1,0) }
 			)},
 
 			//bt5 = Petals On/Off
 			{ |vl| switch( vl,
-				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4299, 0, 302, \ibs, 120, \obs, 0, \pobs, 150, \firstPartial, 1,  \fund, 70, \bank2MidiOffset, 0.99, \spread, 0.99, \inamp,0.5, \inputLen, 0.5);
+				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4299, 0, 1002, \ibs, 120, \obs, 0, \pobs, 154, \firstPartial, 1,  \fund, 70, \bank2MidiOffset, 0.99, \spread, 0.99, \inamp,0.5, \inputLen, 0.5);
 					led.send(2,1);
-					s.sendMsg(\n_map, 4299, \amp, 100);
 					s.sendMsg(\n_map, 4299, \tunerate, 130);
 					s.sendMsg(\n_map, 4299, \itrate, 140);
-					peton=true
 				},
-				0,{ s.sendMsg(\n_set, 4299, \gate, 0); led.send(2,0); peton=false}
+				0,{ s.sendMsg(\n_set, 4299, \gate, 0); led.send(2,0)}
 			)},
 
 			//bt4 = Greyhole On/Off
 			{ |vl| switch( vl,
-				1,{ s.sendMsg( \s_new, \greyhole, 4399, 0, 302, \ibs, 120, \obs, 0, \pobs, 150, \del, 0.3);
-					led.send(3,1);
-					ghon=true;
-					s.sendMsg(\n_map, 4399, \amp, 100);
-					s.sendMsg(\n_map, 4399, \diff, 110);
-				},
-				0,{ s.sendMsg(\n_set, 4399, \gate, 0); led.send(3,0);ghon=false }
-			)},
-
-			//bt8 = Amplify/LongTone On/Off
-			{ |vl| switch( vl,
-				1,{
-					s.sendMsg(\n_set, 4001, \obs, 180);
-					s.sendMsg(\n_set, 4199, \obs, 182);
-					s.sendMsg(\n_set, 4299, \obs, 184);
-					s.sendMsg(\n_set, 4399, \obs, 186);
-					led.send(8,0);
-				},
-				0,{
-					s.sendMsg(\n_set, 4001, \obs, 0);
-					s.sendMsg(\n_set, 4199, \obs, 0);
-					s.sendMsg(\n_set, 4299, \obs, 0);
-					s.sendMsg(\n_set, 4399, \obs, 0);
-					led.send(8,1);
-				}
+				1,{ s.sendMsg( \s_new, \greyhole, 4399, 0, 1002, \ibs, 120, \obs, 0, \pobs, 156); led.send(3,1) },
+				0,{ s.sendMsg(\n_set, 4399, \gate, 0); led.send(3,0) }
 			)}
 
 		];
-		//0.1.wait;
 		//////Arduino Action /////////////////////
 		ino.action = {
 			arg msg;
@@ -181,7 +141,7 @@ s.waitForBoot{
 		////Main Sample
 		s.sendMsg(\b_allocRead, 0, "/Users/jyang/GitHub/the_ocean/samples/LZ_OceanRiff_Mono.aif");
 		////Buffer for Icy Effect
-		s.sendMsg( \b_alloc, 99, (15*44100) );
+		s.sendMsg( \b_alloc, 99, (3*44100) );
 		////Envelope Buffers
 		s.sendMsg(\b_allocRead, 100, "/Users/jyang/GitHub/the_ocean/grainEnv/gEnv_3stageLinear.aif");
 		s.sendMsg(\b_allocRead, 101, "/Users/jyang/GitHub/the_ocean/grainEnv/gEnv_hanning.aif");
@@ -194,8 +154,8 @@ s.waitForBoot{
 		s.sendMsg(\b_allocRead, 108, "/Users/jyang/GitHub/the_ocean/grainEnv/gEnv_expodec.aif");
 		s.sendMsg(\b_allocRead, 109, "/Users/jyang/GitHub/the_ocean/grainEnv/gEnv_rexpodec.aif");
 		////Groups
-		s.sendMsg(\g_new, 300, 1, 1);
-		10.do{|ix| s.sendMsg(\g_new, 301+ix, 3, 300+ix)};
+		s.sendMsg(\g_new, 1000, 1, 1);
+		10.do{|ix| s.sendMsg(\g_new, 1001+ix, 3, 1000+ix)};
 		//SYNTHDEFS///////////////////
 		SynthDef(\indexer, {
 			arg buf, spd=1, start=0, end=1, abus=99, kbus, t_tr=0, pos=0;
@@ -227,9 +187,9 @@ s.waitForBoot{
 		SynthDef(\icy, {
 			arg ibs, obs=0, pobs, buf=0, envbuf = -1, pitchshift=1, winsz=0.8, overlaps=40,
 			resettrig=0, startpos=0.0, endpos=1.0, rand=0.1, ratemin=0.4, ratemax=0.000001,
-			indur=2, t_tr=1, rel=0.3, crv = -6, gate=1, mamp=0.4;
+			indur=2, t_tr=1, rel=0.3, crv = -6, gate=1;
 			var sig, ix, krate, in, writehead, whenv, durenv, sig2, amp;
-			amp = \amp.kr(0.33, 0.03)*mamp;
+			amp = \amp.kr(0.33, 0.03);
 			durenv = EnvGen.ar(Env.asr(0.01, 1, rel, curve: crv),gate,doneAction:2);
 			writehead = Phasor.ar(0, BufRateScale.kr(buf), 0, BufFrames.kr(buf));
 			whenv = EnvGen.ar(Env.linen(0.0, indur, 0.0), t_tr);
@@ -243,7 +203,7 @@ s.waitForBoot{
 		}).add;
 		//// Petals Of Resonance
 		SynthDef("petalsOfResonance", {
-			arg amp=1.0, inamp=1.0, ibs=0, obs=0, pobs, fund=80, firstPartial=1, bank2MidiOffset=0.37, spread=1.33, ringL1=7.75, ringL2=15.5, inputLen=0.5, trig=1, gate=1, tunerate=0.07, itrate=10.5, rel=7;
+			arg masteramp=1.0, inamp=1.0, ibs=0, obs=0, pobs, fund=80, firstPartial=1, bank2MidiOffset=0.37, spread=1.33, ringL1=7.75, ringL2=15.5, inputLen=0.5, trig=1, gate=1, tunerate=0.07, itrate=10.5, rel=7;
 			var	pAmp, partialTunedA, partialTunedB, input, output, outArrayA, outArrayA1, outArrayA2, outArray, inenv, ltdOutput, ltdOutput1, ltdOutput2, masterEnv, finalOut,
 			p1a, p2a, p3a, p4a, p5a, p6a, p7a, p8a, p9a, p10a, p11a, p12a, p13a,
 			p1b, p2b, p3b, p4b, p5b, p6b, p7b, p8b, p9b, p10b, p11b, p12b, p13b,
@@ -352,55 +312,30 @@ s.waitForBoot{
 			ltdOutput1 = Limiter.ar( outArrayA1, 0.98, 0.01 );
 			ltdOutput2 = Limiter.ar( outArrayA2, 0.98, 0.01 );
 			outenv = EnvGen.ar(Env.asr(0.01, 1, rel), gate, doneAction:2);
-			Out.ar(pobs, [ltdOutput1,ltdOutput2]*amp*outenv); //out to private (stereo)bus
-			Out.ar(obs, [ltdOutput1,ltdOutput2]*amp*outenv);
+			Out.ar(pobs, [ltdOutput1,ltdOutput2]*masteramp*outenv); //out to private (stereo)bus
+			Out.ar(obs, [ltdOutput1,ltdOutput2]*masteramp*outenv);
 			/*
 			//MONO
 			//Mixes resonators to a mono channel
 			outArrayA = Mix.ar(outArrayA);
 			ltdOutput = Limiter.ar(outArrayA, 0.98, 0.01);
 			outenv = EnvGen.ar(Env.asr(0.01, 1, 2), gate, doneAction:2);
-			Out.ar(obs, ltdOutput*amp*outenv);
+			Out.ar(obs, ltdOutput*masteramp*outenv);
 			*/
 			}, [0.069]
 		).add;
 		SynthDef(\greyhole, {
-			arg ibs, obs=0, pobs, gate=1, rel=1.7, mamp=0.6;
+			arg ibs, obs=0, gate=1, rel=1.7;
 			var del=\del.kr(2, 0.03), damp=\damp.kr(0, 0.03), size=\size.kr(1, 0.03),
 			diff=\diff.kr(0.707, 0.03), fb=\fb.kr(0.9, 0.03), moddepth=\moddepth.kr(0.1, 0.03), modfreq=\modfreq.kr(2, 0.03);
 			var source, sig, env, amp, sig2;
-			amp = \amp.kr(0.8, 0.03)*mamp;
+			amp = \amp.kr(0.8, 0.03);
 			env = EnvGen.ar(Env.asr(releaseTime:rel), gate, doneAction:2);
 			source = In.ar(ibs);
 			sig = Greyhole.ar(source, del, damp, size, diff, fb, moddepth, modfreq);
 			sig2 = DelayC.ar(sig, 0.2, 0.05);
 			Out.ar(obs, [sig, sig2]*env*amp);
-			Out.ar(pobs, [sig, sig2]*env*amp);
 		}).add;
-		//GRANULATION SYNTH DEFS
-		//LANGUAGE MUSICS GRANULIZATION
-		////Short Attacks
-		SynthDef(\shortAttacks, {
-			arg ibs, obs=0, amp=1, pan=0, dcrv=1,
-			mindurL=0.02, mindurH=0.04, maxdurL=(1/7), maxdurH=0.5,
-			minrateL=1.85, minrateH=4.0, maxrateL=9.0, maxrateH=15.0,
-			ebf= -1;
-			var sig, env, gtr, mtrig, dur, rcrv;
-			var mindur, maxdur, minrate, maxrate;
-			rcrv = \rcrv.kr(9, 0.05);
-			mtrig = Impulse.kr(maxrateH);
-			mindur = TRand.kr(mindurL, mindurH, mtrig);
-			maxdur = TRand.kr(maxdurL, maxdurH, mtrig);
-			minrate = TRand.kr(minrateL, minrateH, mtrig);
-			maxrate = TRand.kr(maxrateL, maxrateH, mtrig);
-			dur = pow( TRand.kr( 0.0, 1.0, mtrig), dcrv ).linlin(0.0, 1.0, mindur, maxdur);
-			gtr = Impulse.kr( pow( TRand.kr( 0.0, 1.0, mtrig), rcrv ).linlin(0.0, 1.0, minrate, maxrate));
-			sig = In.ar(ibs,2);
-			sig = GrainIn.ar(2, gtr,dur,sig,pan,ebf);
-			Out.ar(obs, sig*amp);
-		}).add;
-		//Turn On Amplify/LongTone Light
-		led.send(8,1);
 	}//end fork
 }//end s.waitForBoot
 )
@@ -408,25 +343,22 @@ s.waitForBoot{
 /*
 LEGEND //////////////////
 NODES
-300-3009 = Groups
-300 = Index Group
-301 = Ins Group
-302 = Fx Group
+1000-1009 = Groups
+1000 = Index Group
+1001 = Ins Group
+1002 = Fx Group
 2000s = Main Index Synth
-300 = Samp Play Synth
+3000 = Samp Play Synth
 4000s = Amplify Synths
 4100s = Icy Synths
 4200s = Petals Synths
 4300s = Greyhole
-5000s = Granular
-5100 = Short Attacks
 
 BUSSES
 Audio Busses - 100-199
 100 = Main Index Audio Bus
 120 = Samp Play Bus
 150 = Stereo Busses (pairs) for grainulation
-180 = Dummy Stereo Busses for Alternative Out for Fxs
 //150,151 = Amplify
 //152,153 = Freeze
 //154,155 = Petals
@@ -445,13 +377,13 @@ BUFFERS - 1024
 COMMANDS
 FXs
 Amplify
-s.sendMsg(\s_new, \amplify, 4000, 0, 302, \ibs, 121, \obs, 0);
+s.sendMsg(\s_new, \amplify, 4000, 0, 1002, \ibs, 121, \obs, 0);
 //kill
 s.sendMsg(\n_set, 4000, \gate, 0);
 
 Icy
 //Icy1
-s.sendMsg(\s_new, \icy, 4100, 0, 302, \ibs, 120, \obs, 0, \buf, 99, \envbuf, 100, \winsz, 0.6, \overlaps, 27, \rand, 0.5,\rel, 3, \crv, -3, \rate, 0.02, \amp, 0.6);
+s.sendMsg(\s_new, \icy, 4100, 0, 1002, \ibs, 120, \obs, 0, \buf, 99, \envbuf, 100, \winsz, 0.6, \overlaps, 27, \rand, 0.5,\rel, 3, \crv, -3, \rate, 0.02, \amp, 0.6);
 //kill
 s.sendMsg(\n_set, 4100, \gate, 0);
 
@@ -491,54 +423,11 @@ s.sendMsg(\n_set, 4299, \itrate, 10.1, \inputLen, 0.5 );
 s.queryAllNodes;
 
 arg ibs, obs=0, gate=1, rel=1.7;
-var del=\del.kr(2, 0.03), damp=\damp.kr(0, 0.03), size=\size.kr(1, 0.03),
-diff=\diff.kr(0.707, 0.03), fb=\fb.kr(0.9, 0.03), moddepth=\moddepth.kr(0.1, 0.03), modfreq=\modfreq.kr(2, 0.03);
+			var del=\del.kr(2, 0.03), damp=\damp.kr(0, 0.03), size=\size.kr(1, 0.03),
+			diff=\diff.kr(0.707, 0.03), fb=\fb.kr(0.9, 0.03), moddepth=\moddepth.kr(0.1, 0.03), modfreq=\modfreq.kr(2, 0.03);
 
 
-s.volume = -60
-s.queryAllNodes
-s.volume.volume = 0
 
-v = s.volume;
-v.volume = -180
-v.mute
-s.volume.volume = -60
-
-
-s.sendMsg(\n_set, 4399, \del, 0.3, \size, 1);
-
-s.volume = newVolume
-
-\shortAttacks,
-			arg ibs, obs=0, amp=1, pan=0, dcrv=1,
-			mindurL=0.02, mindurH=0.04, maxdurL=(1/7), maxdurH=0.5,
-			minrateL=1.85, minrateH=4.0, maxrateL=9.0, maxrateH=15.0,
-			ebf= -1;
-s.sendMsg(\s_new, \shortAttacks, 5000, 0, 303, \ibs,150);
-s.sendMsg(\n_set, 5000, \minrateL, 2, \minrateH, 9,  \maxrateL, 13, \maxrateH, 15, \ebf, 109,\mindurL, 0.05, \mindurH, 0.07, \maxdurL, 0.4, \maxdurH, 0.8);
-
-
-s.sendMsg( \s_new, \greyhole, 4300+ghct, 0, 302, \ibs, 120, \obs, 0, \pobs, 150, \del, 0.3)
-s.queryAllNodes
-//Use this to make a randomized long short, short...
-//Bursts of interesting patterns, bebop type phrasing
-(//AND is multiplication OR is addition
-{//swing
-	var master, t0, e0, s0, t1, e1, s1, i1, ie1;
-	master = Phasor.ar(0, (1.0/(44100.0*1.0)) );
-	t0 = master>0.01;
-
-	e0=EnvGen.ar(Env.perc(0.01, 0.2, 1,0),t0);
-	s0=SinOsc.ar(660);
-	t1 = (master>0.25)*(master<0.63);
-	ie1=EnvGen.ar(Env.asr(0.01, 1, 0.01, 0),t1);
-	i1 = Impulse.ar(6)*ie1;
-	e1=EnvGen.ar(Env.perc(0.01, 0.2, 1,0),i1);
-	s1=SinOsc.ar(440);
-	Out.ar(0, [s1*e1, s0*e0])
-
-}.play
-)
 
 
 
