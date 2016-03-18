@@ -38,18 +38,17 @@ s.waitForBoot{
 		//LEDs
 		var led = ArduinoSMS("/dev/tty.wchusbserial1a140", 9600);
 		////Arduino Controlers
-		var ino = ArduinoSMS("/dev/tty.wchusbserial1a130", 9600);
+		var ino = ArduinoSMS("/dev/tty.wchusbserial1a120", 9600);
 		//////Continuous Controller Headers
-		var hh = ["p0", "p1", "p2", "p3", "p4", "fsr0", "fsr1"];
+		var hh = ["p0", "p1", "p2", "p3", "p4", "fsr0"];
 		////////Mappings
 		var ma = [
-			/*p0*/[ [0,1023,0.0,0.85],[0,1023,0.0,1.0],[0,1023,0.0,1.0] ],
+			/*p0*/[ [0,1023,0.0,1.5],[0,1023,0.0,1.0],[0,1023,0.0,1.0] ],
 			/*p1*/[ [0,1023,0.0,1.0],[0,1023,0.0,1.0],[0,1023,0.0,1.0] ],
 			/*p2*/[ [0,1023,0.0,1.0],[0,1023,0.0,1.0],[0,1023,0.0,1.0] ],
 			/*p3*/[ [0,1023,0.01,13.1],[0,1023,0.0,1.0],[0,1023,0.0,1.0] ],
 			/*p4*/[ [0,1023,0.05,10.0],[0,1023,0.0,1.0],[0,1023,0.0,1.0] ],
-			/*fsr0*/[ [100,900,0.01, 21.0], [100, 900, 0.0, 2.2] ],
-			/*fsr1*/[ [200,850,0.8, 0.001], [200,850, 0.0, 1.3] ]
+			/*fsr0*/[ [100,900,0.01, 21.0], [100, 900, 0.0, 2.0] ]
 		];
 		//////Switch Headers
 		var sh = ["b0", "b1", "b2", "b3"];
@@ -67,7 +66,7 @@ s.waitForBoot{
 			)},
 			//b2 = Petals On/Off
 			{ |vl| switch( vl,
-				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4200+petct, 0, 302, \ibs, 120, \obs, 0, \pobs, 150, \pobs2, 164, \inamp, 0.2 ); led.send(2,1); s.sendMsg(\n_map, 4200+petct, \amp, 100); },
+				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4200+petct, 0, 302, \ibs, 120, \obs, 0, \pobs, 150, \pobs2, 164 ); led.send(2,1); s.sendMsg(\n_map, 4200+petct, \amp, 100); },
 				0,{ s.sendMsg(\n_set, 4200+petct, \gate, 0); if(peton==false,{led.send(2,0)}); petct=(petct+1)%5 }
 			)},
 			//b3 = Greyhole
@@ -109,7 +108,7 @@ s.waitForBoot{
 
 			//bt5 = Petals On/Off
 			{ |vl| switch( vl,
-				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4299, 0, 302, \ibs, 120, \obs, 0, \pobs, 150, \firstPartial, 1,  \fund, 70, \bank2MidiOffset, 0.99, \spread, 0.99, \inamp,0.2, \inputLen, 0.5, \pobs2, 164);
+				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4299, 0, 302, \ibs, 120, \obs, 0, \pobs, 150, \firstPartial, 1,  \fund, 70, \bank2MidiOffset, 0.99, \spread, 0.99, \inamp,0.5, \inputLen, 0.5, \pobs2, 164);
 					led.send(2,1);
 					s.sendMsg(\n_map, 4299, \amp, 100);
 					s.sendMsg(\n_map, 4299, \tunerate, 130);
@@ -152,25 +151,12 @@ s.waitForBoot{
 			//bt9 = Granular Switch
 			{ |vl| switch( vl,
 				1,{
-					fork{
-						//short attacks
-						s.sendMsg(\s_new, \shortAttacks, 5000, 0, 303, \ibs,150,\minrateL, 2, \minrateH, 9,  \maxrateL, 15, \maxrateH, 22, \ebf, 108,\mindurL, 0.05, \mindurH, 0.07, \maxdurL, 0.1, \maxdurH, 0.3);
-						s.sendMsg(\n_map, 5000, \minrateL, 150, \minrateH, 150,  \maxrateL, 150, \maxrateH, 150, \amp, 151);
-
-						//trill
-						s.sendMsg(\s_new, \sampTrill, 6000, 0, 303, \obs, 0,\ibs1, 162, \ibs2, 164, \gr1envbuf, 105, \gr2envbuf, 105, \dur1, 0.13, \dur2, 0.13);
-						s.sendMsg(\n_map, 6000, \rate, 160, \amp, 161);
-					s.sendMsg(\n_free, 6000);
-						0.1.wait;
-						s.sendMsg(\s_new, \sampTrill, 6000, 0, 303, \obs, 0,\ibs1, 162, \ibs2, 164, \gr1envbuf, 105, \gr2envbuf, 105, \dur1, 0.13, \dur2, 0.13);
-						s.sendMsg(\n_map, 6000, \rate, 160, \amp, 161);
-
-						led.send(9,1);
-					};
+					s.sendMsg(\s_new, \shortAttacks, 5000, 0, 303, \ibs,150,\minrateL, 2, \minrateH, 9,  \maxrateL, 15, \maxrateH, 22, \ebf, 108,\mindurL, 0.05, \mindurH, 0.07, \maxdurL, 0.1, \maxdurH, 0.3);
+					s.sendMsg(\n_map, 5000, \minrateL, 150, \minrateH, 150,  \maxrateL, 150, \maxrateH, 150, \amp, 151);
+					led.send(9,1);
 				},
 				0,{
 					s.sendMsg(\n_free, 5000);
-					s.sendMsg(\n_free, 6000);
 					led.send(9,0);
 				}
 			)}
@@ -273,14 +259,14 @@ s.waitForBoot{
 		}).add;
 		//// Petals Of Resonance
 		SynthDef("petalsOfResonance", {
-			arg amp=0.8, inamp=1.0, ibs=0, obs=0, pobs, pobs2, fund=80, firstPartial=1, bank2MidiOffset=0.37, spread=1.33, ringL1=7.75, ringL2=15.5, inputLen=0.5, trig=1, gate=1, tunerate=0.07, itrate=10.5, rel=7;
+			arg amp=1.0, inamp=1.0, ibs=0, obs=0, pobs, pobs2, fund=80, firstPartial=1, bank2MidiOffset=0.37, spread=1.33, ringL1=7.75, ringL2=15.5, inputLen=0.5, trig=1, gate=1, tunerate=0.07, itrate=10.5, rel=7;
 			var	pAmp, partialTunedA, partialTunedB, input, output, outArrayA, outArrayA1, outArrayA2, outArray, inenv, ltdOutput, ltdOutput1, ltdOutput2, masterEnv, finalOut,
 			p1a, p2a, p3a, p4a, p5a, p6a, p7a, p8a, p9a, p10a, p11a, p12a, p13a,
 			p1b, p2b, p3b, p4b, p5b, p6b, p7b, p8b, p9b, p10b, p11b, p12b, p13b,
 			resA1, resA2, resA3, resA4, resA5, resA6, resA7, resA8, resA9, resA10, resA11, resA12, resA13,
 			resB1, resB2, resB3, resB4, resB5, resB6, resB7, resB8, resB9, resB10, resB11, resB12, resB13;
 			var outenv, sig2, inputcancel, itr;
-			pAmp = -24.dbamp;
+			pAmp = -10.dbamp;
 			//Two functions to create two sets of partials
 			partialTunedA = 	{
 				arg partialNum;
@@ -430,19 +416,6 @@ s.waitForBoot{
 			sig = In.ar(ibs,2);
 			sig = GrainIn.ar(2, gtr,dur,sig,pan,ebf);
 			Out.ar(obs, sig*amp);
-		}).add;////SAMPLE TRILL
-		SynthDef(\sampTrill, {
-			arg obs=0, ibs1, ibs2, dur1=0.2, dur2=0.2, pan1=0, pan2=0, gr1envbuf= -1, gr2envbuf= -1, rate=0.5, amp=0.85;
-			var in1, in2, gr1, gr2, stsig, g1trig, g2trig, clk, sig;
-			clk = Phasor.ar(0, (1.0/(44100.0*rate)) );
-			in1 = In.ar(ibs1, 2);
-			in2 = In.ar(ibs2, 2);
-			g1trig = clk>0.25;
-			g2trig = clk>0.75;
-			gr1 = GrainIn.ar(2, g1trig, dur1, in1, pan1, gr1envbuf);
-			gr2 = GrainIn.ar(2, g2trig, dur2, in2, pan2, gr2envbuf);
-			sig = Mix.ar([gr1, gr2]);
-			Out.ar( obs, sig*amp);
 		}).add;
 		//Turn On Amplify/LongTone Light
 		led.send(8,1);
@@ -465,7 +438,6 @@ NODES
 4300s = Greyhole
 5000s = Granular
 5100 = Short Attacks
-6000 = TRill
 
 BUSSES
 Audio Busses - 100-199
@@ -557,10 +529,10 @@ s.sendMsg(\n_set, 4399, \del, 0.3, \size, 1);
 s.volume = newVolume
 
 \shortAttacks,
-arg ibs, obs=0, amp=1, pan=0, dcrv=1,
-mindurL=0.02, mindurH=0.04, maxdurL=(1/7), maxdurH=0.5,
-minrateL=1.85, minrateH=4.0, maxrateL=9.0, maxrateH=15.0,
-ebf= -1;
+			arg ibs, obs=0, amp=1, pan=0, dcrv=1,
+			mindurL=0.02, mindurH=0.04, maxdurL=(1/7), maxdurH=0.5,
+			minrateL=1.85, minrateH=4.0, maxrateL=9.0, maxrateH=15.0,
+			ebf= -1;
 s.sendMsg(\s_new, \shortAttacks, 5000, 0, 303, \ibs,150);
 s.sendMsg(\n_set, 5000, \minrateL, 2, \minrateH, 9,  \maxrateL, 13, \maxrateH, 15, \ebf, 109,\mindurL, 0.05, \mindurH, 0.07, \maxdurL, 0.4, \maxdurH, 0.8);
 
@@ -587,12 +559,6 @@ s.queryAllNodes
 }.play
 )
 
-
-s.sendMsg(\s_new, \sampTrill, 6001, 0, 303, \obs, 0,\ibs1, 162, \ibs2, 164, \gr1envbuf, 105, \gr1envbuf, 105);
-s.sendMsg(\n_set, 6001, \gr1envbuf, 105, \gr1envbuf, 105, \rate, 0.2 );
-
-s.sendMsg(\n_map, 6001, \rate, 160, \amp, 161);
-, \dur1, 0.15, \dur2, 0.15, \gr1envbuf, 102, \gr2envbuf, 102, \rate, 2
 
 
 

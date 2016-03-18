@@ -38,12 +38,12 @@ s.waitForBoot{
 		//LEDs
 		var led = ArduinoSMS("/dev/tty.wchusbserial1a140", 9600);
 		////Arduino Controlers
-		var ino = ArduinoSMS("/dev/tty.wchusbserial1a130", 9600);
+		var ino = ArduinoSMS("/dev/tty.wchusbserial1a120", 9600);
 		//////Continuous Controller Headers
 		var hh = ["p0", "p1", "p2", "p3", "p4", "fsr0", "fsr1"];
 		////////Mappings
 		var ma = [
-			/*p0*/[ [0,1023,0.0,0.85],[0,1023,0.0,1.0],[0,1023,0.0,1.0] ],
+			/*p0*/[ [0,1023,0.0,1.5],[0,1023,0.0,1.0],[0,1023,0.0,1.0] ],
 			/*p1*/[ [0,1023,0.0,1.0],[0,1023,0.0,1.0],[0,1023,0.0,1.0] ],
 			/*p2*/[ [0,1023,0.0,1.0],[0,1023,0.0,1.0],[0,1023,0.0,1.0] ],
 			/*p3*/[ [0,1023,0.01,13.1],[0,1023,0.0,1.0],[0,1023,0.0,1.0] ],
@@ -67,7 +67,7 @@ s.waitForBoot{
 			)},
 			//b2 = Petals On/Off
 			{ |vl| switch( vl,
-				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4200+petct, 0, 302, \ibs, 120, \obs, 0, \pobs, 150, \pobs2, 164, \inamp, 0.2 ); led.send(2,1); s.sendMsg(\n_map, 4200+petct, \amp, 100); },
+				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4200+petct, 0, 302, \ibs, 120, \obs, 0, \pobs, 150, \pobs2, 164 ); led.send(2,1); s.sendMsg(\n_map, 4200+petct, \amp, 100); },
 				0,{ s.sendMsg(\n_set, 4200+petct, \gate, 0); if(peton==false,{led.send(2,0)}); petct=(petct+1)%5 }
 			)},
 			//b3 = Greyhole
@@ -109,7 +109,7 @@ s.waitForBoot{
 
 			//bt5 = Petals On/Off
 			{ |vl| switch( vl,
-				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4299, 0, 302, \ibs, 120, \obs, 0, \pobs, 150, \firstPartial, 1,  \fund, 70, \bank2MidiOffset, 0.99, \spread, 0.99, \inamp,0.2, \inputLen, 0.5, \pobs2, 164);
+				1,{ s.sendMsg( \s_new, \petalsOfResonance, 4299, 0, 302, \ibs, 120, \obs, 0, \pobs, 150, \firstPartial, 1,  \fund, 70, \bank2MidiOffset, 0.99, \spread, 0.99, \inamp,0.5, \inputLen, 0.5, \pobs2, 164);
 					led.send(2,1);
 					s.sendMsg(\n_map, 4299, \amp, 100);
 					s.sendMsg(\n_map, 4299, \tunerate, 130);
@@ -273,14 +273,14 @@ s.waitForBoot{
 		}).add;
 		//// Petals Of Resonance
 		SynthDef("petalsOfResonance", {
-			arg amp=0.8, inamp=1.0, ibs=0, obs=0, pobs, pobs2, fund=80, firstPartial=1, bank2MidiOffset=0.37, spread=1.33, ringL1=7.75, ringL2=15.5, inputLen=0.5, trig=1, gate=1, tunerate=0.07, itrate=10.5, rel=7;
+			arg amp=1.0, inamp=1.0, ibs=0, obs=0, pobs, pobs2, fund=80, firstPartial=1, bank2MidiOffset=0.37, spread=1.33, ringL1=7.75, ringL2=15.5, inputLen=0.5, trig=1, gate=1, tunerate=0.07, itrate=10.5, rel=7;
 			var	pAmp, partialTunedA, partialTunedB, input, output, outArrayA, outArrayA1, outArrayA2, outArray, inenv, ltdOutput, ltdOutput1, ltdOutput2, masterEnv, finalOut,
 			p1a, p2a, p3a, p4a, p5a, p6a, p7a, p8a, p9a, p10a, p11a, p12a, p13a,
 			p1b, p2b, p3b, p4b, p5b, p6b, p7b, p8b, p9b, p10b, p11b, p12b, p13b,
 			resA1, resA2, resA3, resA4, resA5, resA6, resA7, resA8, resA9, resA10, resA11, resA12, resA13,
 			resB1, resB2, resB3, resB4, resB5, resB6, resB7, resB8, resB9, resB10, resB11, resB12, resB13;
 			var outenv, sig2, inputcancel, itr;
-			pAmp = -24.dbamp;
+			pAmp = -10.dbamp;
 			//Two functions to create two sets of partials
 			partialTunedA = 	{
 				arg partialNum;
